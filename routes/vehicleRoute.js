@@ -4,7 +4,7 @@ const {
   createVehicleValidator,
   updateVehicleValidator,
   deleteVehicleValidator,
-} = require('../utils/validators/VehicleValidator');
+} = require('../utils/validators/vehicleValidator');
 
 const {
   getVehicles,
