@@ -15,7 +15,7 @@ const {
   updateMark,
   deleteMark,
   uploadMarkImage,
-  resizeImage,
+  uploadMarkImageToCloudinary,
 } = require('../services/markService');
 
 const router = express.Router();
@@ -27,7 +27,7 @@ router
     authService.protect,
     authService.allowedTo('admin', 'manager'),
     uploadMarkImage,
-    resizeImage,
+    uploadMarkImageToCloudinary,
     createMarkValidator,
     createMark
   );
@@ -38,7 +38,7 @@ router
     authService.protect,
     authService.allowedTo('admin', 'manager'),
     uploadMarkImage,
-    resizeImage,
+    uploadMarkImageToCloudinary,
     updateMarkValidator,
     updateMark
   )

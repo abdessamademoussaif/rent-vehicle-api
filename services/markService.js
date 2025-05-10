@@ -1,29 +1,21 @@
 const asyncHandler = require('express-async-handler');
-const { v4: uuidv4 } = require('uuid');
-const sharp = require('sharp');
 const path = require('path');
-
 const factory = require('./handlersFactory');
 const { uploadSingleImage } = require('../middlewares/uploadImageMiddleware');
 const Mark = require('../models/markModel');
+const cloudinary = require('../config/cloudinary');
 
-// Upload single image
+
 exports.uploadMarkImage = uploadSingleImage('image');
 
-// Image processing
-exports.resizeImage = asyncHandler(async (req, res, next) => {
-  const mimeType = req.file.mimetype;
-  const originalExt = mimeType.split('/')[1];
-  const extension = ['jpeg', 'png', 'webp'].includes(originalExt) ? originalExt : 'jpeg';
-  const filename = `mark-${uuidv4()}-${Date.now()}.${extension}`;
+exports.uploadMarkImageToCloudinary = asyncHandler(async (req, res, next) => {
+  if (req.file) {
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'Marks',
+    });
 
-  await sharp(req.file.buffer)
-    .resize(600, 600)
-    .toFile(`uploads/marks/${filename}`);
-
-  // Save image into our db 
-   req.body.image = filename;
-
+    req.body.image = result.secure_url;
+  }
   next();
 });
 

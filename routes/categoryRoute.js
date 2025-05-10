@@ -14,7 +14,7 @@ const {
   updateCategory,
   deleteCategory,
   uploadCategoryImage,
-  resizeImage,
+  uploadCategoryImageToCloudinary,
 } = require('../services/categoryService');
 
 const authService = require('../services/authService');
@@ -30,7 +30,7 @@ router
     authService.protect,
     authService.allowedTo('admin', 'manager'),
     uploadCategoryImage,
-    resizeImage,
+    uploadCategoryImageToCloudinary,
     createCategoryValidator,
     createCategory
   );
@@ -41,7 +41,7 @@ router
     authService.protect,
     authService.allowedTo('admin', 'manager'),
     uploadCategoryImage,
-    resizeImage,
+    uploadCategoryImageToCloudinary,
     updateCategoryValidator,
     updateCategory
   )
