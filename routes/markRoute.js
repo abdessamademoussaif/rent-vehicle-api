@@ -4,7 +4,7 @@ const {
   createMarkValidator,
   updateMarkValidator,
   deleteMarkValidator,
-} = require('../utils/validators/MarkValidator');
+} = require('../utils/validators/markValidator');
 
 const authService = require('../services/authService');
 
