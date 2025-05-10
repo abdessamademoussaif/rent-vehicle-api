@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const slugify = require('slugify');
 const vehicleSchema = new mongoose.Schema(
   {
     title: {
@@ -20,7 +20,7 @@ const vehicleSchema = new mongoose.Schema(
       required: true
     },
     slug: {
-      type: String,
+      type: String, 
       lowercase: true,
     },
     capacity: {
@@ -67,7 +67,7 @@ const vehicleSchema = new mongoose.Schema(
       min: [0, 'Vehicle mileage must be above 0'],
     },
     year: {
-      type: Number,
+      type: Number, 
       required: [true, 'Vehicle year is required'],
       min: [1886, 'Vehicle year must be above 1886'],
     },
@@ -92,7 +92,7 @@ const vehicleSchema = new mongoose.Schema(
       type: Number,
       min: [1, 'Vehicle cylinders must be above 0'],
     },
-    offertype: {
+    offerType: {
       type: String,
       required: [true, 'Vehicle offer type is required'],
       enum: {
@@ -165,32 +165,20 @@ vehicleSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'category',
     select: 'name -_id',
+  }).populate({
+    path: 'mark',
+    select: 'name -_id',
+  }).populate({
+    path: 'owner',
+    select: 'name email phone profileImg -_id',
   });
   next();
 });
-
-const setImageURL = (doc) => {
-  if (doc.imageCover) {
-    const imageUrl = `${process.env.BASE_URL}/vehicles/${doc.imageCover}`;
-    doc.imageCover = imageUrl;
+vehicleSchema.pre('save', function (next) {
+  if (this.name) {
+    this.slug = slugify(this.name, { lower: true });
   }
-  if (doc.images) {
-    const imagesList = [];
-    doc.images.forEach((image) => {
-      const imageUrl = `${process.env.BASE_URL}/vehicles/${image}`;
-      imagesList.push(imageUrl);
-    });
-    doc.images = imagesList;
-  }
-};
-// findOne, findAll and update
-vehicleSchema.post('init', (doc) => {
-  setImageURL(doc);
-});
-
-// create
-vehicleSchema.post('save', (doc) => {
-  setImageURL(doc);
+  next();
 });
 
 module.exports = mongoose.model('Vehicle', vehicleSchema);

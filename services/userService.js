@@ -11,6 +11,21 @@ const cloudinary = require('../config/cloudinary');
 // Upload single image
 exports.uploadUserImage = uploadSingleImage('profileImg');
 
+exports.uploadUserImageToCloudinary = asyncHandler(async (req, res, next) => {
+  if (req.file) {
+    console.log('req.body:', req.body); 
+    console.log('req.files:', req.file); 
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'users',
+    });
+
+    // Save URL and public_id in request body
+    req.body.profileImg = result.secure_url;
+    req.body.profileImgPublicId = result.public_id;
+  }
+  next();
+});
+
 // @desc    Get list of users
 // @route   GET /api/v1/users
 // @access  Private/Admin
@@ -57,7 +72,9 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   );
   res.status(200).json({ data: document });
 });
-
+// @desc    Change user password
+// @route   PUT /api/v1/users/changePassword/:id
+// @access  Private/Admin
 exports.changeUserPassword = asyncHandler(async (req, res, next) => {
   const document = await User.findByIdAndUpdate(
     req.params.id,
@@ -87,6 +104,19 @@ exports.deleteUser = factory.deleteOne(User);
 exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
   req.params.id = req.user._id;
   next();
+});
+
+// @desc    Count users
+// @route   GET /api/v1/users/count
+// @access  Private/Admin
+exports.countUsers = asyncHandler(async (req, res, next) => {
+  const count = await User.countDocuments();
+  res.status(200).json({
+    status: 'success',
+    data: {
+      count,
+    },
+  });
 });
 
 // @desc    Update logged user password
@@ -128,6 +158,22 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: updatedUser });
 });
 
+// @desc    Update logged user image
+// @route   PUT /api/v1/users/updateImgMe
+// @access  Private/Protect
+exports.updateLoggedUserImage = asyncHandler(async (req, res, next) => {
+    const updateUser = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        profileImg: req.body.profileImg,
+        profileImgPublicId: req.body.profileImgPublicId,
+      },
+      { new: true }
+    );
+    res.status(200).json({ data: updateUser });
+});
+
+
 // @desc    Deactivate logged user
 // @route   DELETE /api/v1/users/deleteMe
 // @access  Private/Protect
@@ -136,3 +182,40 @@ exports.deleteLoggedUserData = asyncHandler(async (req, res, next) => {
 
   res.status(2007[[]]).json({ status: 'Success' });
 });
+// @desc    Deactivate user
+// @route   DELETE /api/v1/users/deactivate/:id
+// @access  Private/Admin
+
+exports.deactivateUser = asyncHandler(async (req, res, next) => { 
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    { active: false },
+    { new: true }
+  );
+
+  if (!user) {
+    return next(new ApiError(`No document for this id ${req.params.id}`, 404));
+  }
+
+  res.status(200).json({ status: 'success', data: null });
+}
+);
+
+// @desc    Activate user
+// @route   PUT /api/v1/users/activate/:id
+// @access  Private/Admin
+
+exports.activateUser = asyncHandler(async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    { active: true },
+    { new: true }
+  );
+
+  if (!user) {
+    return next(new ApiError(`No document for this id ${req.params.id}`, 404));
+  }
+
+  res.status(200).json({ status: 'success', data: null });
+}
+);

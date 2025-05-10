@@ -24,16 +24,16 @@ dbConnection();
 
 // express app
 const app = express();
-
-// Enable other domains to access your application
-app.use(cors());
-app.options('*', cors());
-app.use(cors({
-  origin: process.env.CLIENT_URL, // Allow frontend origin
-  credentials: true, // Enable cookies in CORS
-}));
-
 app.use(cookieParser());
+const corsOptions = {
+  origin: process.env.CLIENT_URL, 
+  credentials: true, // Enable cookies in CORS
+};
+
+app.use(cors(corsOptions));
+
+app.options('*', cors(corsOptions));
+
 // compress all responses
 app.use(compression());
 
@@ -52,7 +52,7 @@ if (process.env.NODE_ENV === 'development') {
 // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 10000,
   message:
     'Too many accounts created from this IP, please try again after an hour',
 });

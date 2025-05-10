@@ -21,21 +21,6 @@ const markSchema = new mongoose.Schema(
 );
 
 
-const setImageURL = (doc) => {
-  if (doc.image) {
-    const modelFolder = doc.constructor.modelName.toLowerCase() + 's';
-    doc.image = `${process.env.BASE_URL}/${modelFolder}/${doc.image}`;
-  }
-};
-// findOne, findAll and update
-markSchema.post('init', (doc) => {
-  setImageURL(doc);
-});
-
-// create
-markSchema.post('save', (doc) => {
-  setImageURL(doc);
-});
 
 markSchema.pre('save', function (next) {
   if (this.name) {

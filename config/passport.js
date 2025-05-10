@@ -14,15 +14,14 @@ passport.use(
         const user = await User.findOne({ email: profile.emails[0].value });
 
         if (user) return done(null, user);
-
-        // If user doesn't exist, create one
+        
         const newUser = await User.create({
           name: profile.displayName,
           email: profile.emails[0].value,
-          password: Math.random().toString(36).slice(-8), // random password
+          password: Math.random().toString(36).slice(-8), 
           profileImg: profile.photos[0].value,
         });
-
+        
         return done(null, newUser);
       } catch (err) {
         return done(err, false);

@@ -16,17 +16,36 @@ router.get(
   passport.authenticate('google', { session: false }),
   (req, res) => {
     const token = createToken(req.user._id);
-
-    // Set token in HTTP-only cookie
-    res.cookie('jwt', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // secure in prod
-      sameSite: 'Lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+   
+    res.cookie('authToken', token, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    // Redirect to frontend with message only (no token in URL)
-    res.redirect(`${process.env.CLIENT_URL}/dashboard?messages=success[0]=signin-success`);
+    res.cookie('profileImg', req.user.profileImg, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie('userId', req.user._id.toString() , {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie('role', req.user.role, {
+      httpOnly: false, 
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+   
+    res.redirect(`${process.env.CLIENT_URL}`);
   }
 );
 

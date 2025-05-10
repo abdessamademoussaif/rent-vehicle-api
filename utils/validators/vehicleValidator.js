@@ -44,10 +44,10 @@ exports.createVehicleValidator = [
     }),
 
   check('color')
-    .optional()
-    .isArray()
-    .withMessage('Color should be array of string'),
-  check('imageCover').notEmpty().withMessage('Vehicle imageCover is required'),
+    .optional(),
+  check('imageCover')
+  .notEmpty()
+  .withMessage('Vehicle imageCover is required'),
   check('images')
     .optional()
     .isArray()
@@ -102,7 +102,7 @@ exports.createVehicleValidator = [
   .withMessage('Vehicle capacity must be a number')
   .isLength({ max: 32 })
   .withMessage('To long capacity'),
-  check('fueltype')
+  check('fuelType')
     .notEmpty()
     .withMessage('Vehicle fueltype is required')
     .isString()
@@ -123,11 +123,6 @@ exports.createVehicleValidator = [
     .withMessage('Vehicle location must be a string')
     .isLength({ max: 32 })
     .withMessage('To long location'),
-  check('availability')
-    .notEmpty()
-    .withMessage('Vehicle availability is required')
-    .isBoolean()
-    .withMessage('Vehicle availability must be a Boolean'),
     check('condition')
     .notEmpty()
     .withMessage('Vehicle condition is required')
@@ -136,9 +131,9 @@ exports.createVehicleValidator = [
     .isLength({ max: 32 })
     .withMessage('To long condition'),
   check('mileage')
-    .notEmpty()
+    .notEmpty() 
     .withMessage('Vehicle mileage is required')
-    .isNumeric()
+    .isNumeric() 
     .withMessage('Vehicle mileage must be a number')
     .isLength({ max: 32 })
     .withMessage('To long mileage'),
@@ -175,7 +170,7 @@ exports.createVehicleValidator = [
     .withMessage('Vehicle cylinders must be a number')
     .isLength({ max: 32 })
     .withMessage('To long cylinders'),
-  check('offertype')
+  check('offerType')
     .notEmpty()
     .withMessage('Vehicle offertype is required')
     .isString()
@@ -185,11 +180,8 @@ exports.createVehicleValidator = [
   check('features')
     .optional()
     .isArray()
-    .withMessage('Vehicle features must be an array of strings')
-    .isString()
-    .withMessage('Vehicle features must be a string')
-    .isLength({ max: 32 })
-    .withMessage('To long features'),
+    .withMessage('Vehicle features must be an array of strings'),
+    validatorMiddleware,
 ];
 
 exports.getVehicleValidator = [

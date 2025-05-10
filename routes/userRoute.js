@@ -20,8 +20,12 @@ const {
   updateLoggedUserPassword,
   updateLoggedUserData,
   deleteLoggedUserData,
+  updateLoggedUserImage,
+  uploadUserImageToCloudinary,
+  deactivateUser,
+  activateUser,
+  countUsers,
 } = require('../services/userService');
-const { uploadUserImageToCloudinary } = require('../middlewares/uploadImageMiddleware');
 
 const authService = require('../services/authService');
 
@@ -33,9 +37,10 @@ router.get('/getMe', getLoggedUserData, getUser);
 router.put('/changeMyPassword', updateLoggedUserPassword);
 router.put('/updateMe', updateLoggedUserValidator, updateLoggedUserData);
 router.delete('/deleteMe', deleteLoggedUserData);
+router.put('/updateImgMe', uploadUserImage, uploadUserImageToCloudinary, updateLoggedUserImage);
 
 // Admin
-router.use(authService.allowedTo('admin', 'manager'));
+router.use(authService.allowedTo('admin'));
 router.put(
   '/changePassword/:id',
   changeUserPasswordValidator,
@@ -45,10 +50,26 @@ router
   .route('/')
   .get(getUsers)
   .post(uploadUserImage, uploadUserImageToCloudinary, createUserValidator, createUser);
+
+router.get('/count', countUsers);
+
+
 router
   .route('/:id')
   .get(getUserValidator, getUser)
   .put(uploadUserImage, uploadUserImageToCloudinary, updateUserValidator, updateUser)
   .delete(deleteUserValidator, deleteUser);
+router
+.route('/deactivate/:id')
+.put(
+  deleteUserValidator,
+  deactivateUser
+);
 
+router
+.route('/activate/:id')
+.put(
+  deleteUserValidator,
+  activateUser
+)
 module.exports = router;

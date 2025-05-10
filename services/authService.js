@@ -51,10 +51,8 @@ exports.login = asyncHandler(async (req, res, next) => {
 exports.protect = asyncHandler(async (req, res, next) => {
   // 1) Check if token exist, if exist get
   let token;
-  console.log('req.cookies', req.cookies);
-  console.log('req.headers.authorization', req.headers.authorization);
-  
-  // 1️⃣ From HTTP-only cookie
+  // console.log('req.cookies', req.cookies);
+  // console.log('req.headers.authorization', req.headers.authorization);
   if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }
@@ -106,6 +104,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
   }
 
   req.user = currentUser;
+  console.log("protect passed");
   next();
 });
 
@@ -113,6 +112,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
 // ["admin", "manager"]
 exports.allowedTo = (...roles) =>
   asyncHandler(async (req, res, next) => {
+    console.log("request is :",req.body)
     // 1) access roles
     // 2) access registered user (req.user.role)
     if (!roles.includes(req.user.role)) {
@@ -264,5 +264,5 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 
   // 3) if everything is ok, generate token
   const token = createToken(user._id);
-  res.status(200).json({ token });
+  res.status(200).json({ data:user , token });
 });

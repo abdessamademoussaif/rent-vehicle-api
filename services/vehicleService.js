@@ -1,6 +1,4 @@
 const asyncHandler = require('express-async-handler');
-const { v4: uuidv4 } = require('uuid');
-const sharp = require('sharp');
 
 const { uploadMixOfImages } = require('../middlewares/uploadImageMiddleware');
 const factory = require('./handlersFactory');
@@ -8,7 +6,7 @@ const Vehicle = require('../models/vehicleModel');
 
 exports.uploadVehicleImages = uploadMixOfImages([
   {
-    name: 'imageCover',
+    name: 'imageCover', 
     maxCount: 1,
     
   },
@@ -18,46 +16,23 @@ exports.uploadVehicleImages = uploadMixOfImages([
   },
   
 ]);
-exports.resizeVehicleImages = asyncHandler(async (req, res, next) => {
-  
-  // console.log(req.files);
-  //1- Image processing for imageCover
-  if (req.files.imageCover) {
-    const imageCoverFileName = `vehicle-${uuidv4()}-${Date.now()}-cover.jpeg`;
 
-    await sharp(req.files.imageCover[0].buffer)
-      .resize(2000, 1333)
-      .toFormat('jpeg')
-      .jpeg({ quality: 95 })
-      .toFile(`uploads/vehicles/${imageCoverFileName}`);
+exports.setVehicleImagesUrls = asyncHandler(async (req, res, next) => {
+  if (!req.files) return next();
 
-    // Save image into our db
-    req.body.imageCover = imageCoverFileName;
+  // 1- Image Cover
+  if (req.files.imageCover && req.files.imageCover.length > 0) {
+    req.body.imageCover = req.files.imageCover[0].path; // path is the Cloudinary URL
   }
-  //2- Image processing for images
-  if (req.files.images) {
-    console.log("2");
-    req.body.images = [];
-    console.log("3");
-    await Promise.all(
-      
-      req.files.images.map(async (img, index) => {
-        
-        const imageName = `vehicle-${uuidv4()}-${Date.now()}-${index + 1}.jpeg`;
-         
-        await sharp(img.buffer)
-          .resize(2000, 1333)
-          .toFormat('jpeg')
-          .jpeg({ quality: 95 })
-          .toFile(`uploads/vehicles/${imageName}`);
-          
-        // Save image into our db
-        req.body.images.push(imageName);
-      })
-    );
+
+  // 2- Other Images
+  if (req.files.images && req.files.images.length > 0) {
+    req.body.images = req.files.images.map(file => file.path);
   }
   next();
 });
+
+
 
 // @desc    Get list of vehicles
 // @route   GET /api/v1/vehicles
@@ -68,9 +43,39 @@ exports.getVehicles = factory.getAll(Vehicle, 'Vehicles');
 // @route   GET /api/v1/vehicles/:id
 // @access  Public
 exports.getVehicle = factory.getOne(Vehicle, 'reviews');
+// @desc    Get  vehicles by user id
+// @route   GET /api/v1/vehicles/user/:userId
+// @access  Private
+exports.getVehiclesByUserId = asyncHandler(async (req, res, next) => {
+  const vehicles = await Vehicle.find({ owner: req.params.userId });
+  if (!vehicles) {
+    return next(new ApiError('No vehicles found for this user', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    results: vehicles.length,
+    data: {
+      vehicles,
+    },
+  });
+});
+
+// @desc    Count vehicles
+// @route   GET /api/v1/vehicles/count
+// @access  private/admin
+exports.countVehicles = asyncHandler(async (req, res, next) => {
+  const count = await Vehicle.countDocuments();
+  res.status(200).json({
+    status: 'success',
+    data: {
+      count,
+    },
+  });
+});
 // @desc    Create vehicle
 // @route   POST  /api/v1/vehicles
 // @access  Private
+
 exports.createVehicle = factory.createOne(Vehicle);
 // @desc    Update specific vehicle
 // @route   PUT /api/v1/vehicles/:id
