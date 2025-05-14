@@ -24,6 +24,9 @@ dbConnection();
 
 // express app
 const app = express();
+
+app.set('trust proxy', 1);
+
 app.use(cookieParser());
 const corsOptions = {
   origin: process.env.CLIENT_URL, 

@@ -76,8 +76,6 @@ exports.countVehicles = asyncHandler(async (req, res, next) => {
 // @desc    Create vehicle
 // @route   POST  /api/v1/vehicles
 // @access  Private
-
-
 exports.createVehicle = factory.createOne(Vehicle);
 // @desc    Update specific vehicle
 // @route   PUT /api/v1/vehicles/:id
