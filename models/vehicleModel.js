@@ -28,6 +28,9 @@ const vehicleSchema = new mongoose.Schema(
       required: [true, 'Vehicle capacity is required'],
       min: [1, 'Vehicle capacity must be above 0'],
     },
+    model: {
+      type: String
+    },
     fuelType: {
       type: String,
       required: [true, 'Vehicle fuel type is required'],
@@ -170,7 +173,7 @@ vehicleSchema.pre(/^find/, function (next) {
     select: 'name -_id',
   }).populate({
     path: 'owner',
-    select: 'name email phone profileImg -_id',
+    select: 'title name email phone profileImg _id',
   });
   next();
 });

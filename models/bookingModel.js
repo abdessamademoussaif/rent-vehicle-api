@@ -12,6 +12,12 @@ const bookingSchema = new mongoose.Schema(
       ref: 'User',
       required: [true, 'Booking must be made by a user'],
     },
+    userPhone:{
+      type: String,
+    },
+    userAddress:{
+      type: String,
+    },
     startDate: {
       type: Date,
       required: [true, 'Booking start date is required'],

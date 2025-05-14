@@ -17,6 +17,7 @@ const {
   setVehicleImagesUrls,
   countVehicles,
 } = require('../services/vehicleService');
+const setVehicleSearchFilter = require('../middlewares/setVehicleSearchFilter');
 const authService = require('../services/authService');
 const reviewsRoute = require('./reviewRoute');
 const router = express.Router();
@@ -36,7 +37,14 @@ router
     createVehicle
   );
 
-
+  // @desc    search vehicles
+  // @route   GET /api/v1/vehicles/search?mark=tayota&maxPrice=1000&minPrice=500...as you want
+  // @access  Public
+  router.route('/search').get(
+    setVehicleSearchFilter,
+    getVehicles
+  );
+  
   router.route('/count').get(
     authService.protect,
     authService.allowedTo('admin'),

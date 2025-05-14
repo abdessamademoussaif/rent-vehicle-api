@@ -1,11 +1,9 @@
 const nodemailer = require('nodemailer');
 
-// Nodemailer
 const sendEmail = async (options) => {
-  // 1) Create transporter ( service that will send email like "gmail","Mailgun", "mialtrap", sendGrid)
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT, // if secure false port = 587, if true port= 465
+    port: process.env.EMAIL_PORT,
     secure: true,
     auth: {
       user: process.env.EMAIL_USER,
@@ -13,15 +11,23 @@ const sendEmail = async (options) => {
     },
   });
 
-  // 2) Define email options (like from, to, subject, email content)
   const mailOpts = {
-    from: 'EASYTRANS Platform <tewbacshakour@gmail.comgmail.com>',
+    from: 'EASYTRANS Platform <tewbacshakour@gmail.com>',
     to: options.email,
     subject: options.subject,
     html: options.message,
   };
 
-  // 3) Send email
+  if (options.pdfBuffer) {
+    mailOpts.attachments = [
+      {
+        filename: 'generated.pdf',
+        content: options.pdfBuffer,
+        contentType: 'application/pdf',
+      },
+    ];
+  }
+
   await transporter.sendMail(mailOpts);
 };
 

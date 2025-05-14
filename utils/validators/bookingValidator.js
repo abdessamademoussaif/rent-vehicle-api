@@ -29,6 +29,7 @@ exports.isVehicleAlreadyBooked = async (req, res, next) => {
 
     const query = {
       vehicle,
+      status: { $in: ["pending", "confirmed"] },
       $or: [
         { startDate: { $lte: endDate, $gte: startDate } },
         { endDate: { $gte: startDate, $lte: endDate } },
@@ -40,7 +41,10 @@ exports.isVehicleAlreadyBooked = async (req, res, next) => {
 
     if (isBooking) {
       return next(
-        new ApiError(`This vehicle is already booked until ${new Date(isBooking.endDate).toLocaleDateString()}`, 400)                                                                                                                                                                                            
+        new ApiError(
+          `This vehicle is already booked until ${new Date(isBooking.endDate).toLocaleDateString()}`,
+          400
+        )
       );
     }
 

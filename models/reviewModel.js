@@ -3,8 +3,10 @@ const Vehicle= require('./vehicleModel');
 
 const reviewSchema = new mongoose.Schema(
   {
-    title: {
+    comment: {
       type: String,
+      trim: true,
+      maxlength: 500,
     },
     ratings: {
       type: Number,
@@ -32,18 +34,17 @@ reviewSchema.pre(/^find/, function (next) {
   next();
 });
 
-reviewSchema.statics.calcAverageRatingsAndQuantity = async function (vehicleId){
+reviewSchema.statics.calcAverageRatings = async function (vehicleId){
   const result = await this.aggregate([
     // Stage 1 : get all reviews in specific vehicle
     {
       $match: { vehicle: vehicleId },
     },
-    // Stage 2: Grouping reviews based on vehicleID and calc avgRatings, ratingsQuantity
+    // Stage 2: Grouping reviews based on vehicleID and calc avgRatings
     {
       $group: {
         _id: '$vehicle',
         avgRatings: { $avg: '$ratings' },
-        ratingsQuantity: { $sum: 1 },
       },
     },
   ]);
@@ -51,13 +52,11 @@ reviewSchema.statics.calcAverageRatingsAndQuantity = async function (vehicleId){
   // console.log(result);
   if (result.length > 0) {
     await Vehicle.findByIdAndUpdate(vehicleId, {
-      ratingsAverage: result[0].avgRatings,
-      ratingsQuantity: result[0].ratingsQuantity,
+      ratingsAverage:  parseFloat(result[0].avgRatings.toFixed(1)),
     });
   } else {
     await Vehicle.findByIdAndUpdate(vehicleId, {
       ratingsAverage: 0,
-      ratingsQuantity: 0,
     });
   }
 };
@@ -65,11 +64,11 @@ reviewSchema.statics.calcAverageRatingsAndQuantity = async function (vehicleId){
 reviewSchema.index({ vehicle: 1, user: 1 }, { unique: true });
 
 reviewSchema.post('save', async function () {
-  await this.constructor.calcAverageRatingsAndQuantity(this.vehicle);
+  await this.constructor.calcAverageRatings(this.vehicle);
 });
 
 reviewSchema.post('remove', async function () {
-  await this.constructor.calcAverageRatingsAndQuantity(this.vehicle);
+  await this.constructor.calcAverageRatings(this.vehicle);
 });
 
 module.exports = mongoose.model('Review', reviewSchema);

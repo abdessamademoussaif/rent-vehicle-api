@@ -26,7 +26,7 @@ const {
   activateUser,
   countUsers,
 } = require('../services/userService');
-
+const deletVehiclesUser = require('../middlewares/deletVehiclesUser');
 const authService = require('../services/authService');
 
 const router = express.Router();
@@ -58,7 +58,7 @@ router
   .route('/:id')
   .get(getUserValidator, getUser)
   .put(uploadUserImage, uploadUserImageToCloudinary, updateUserValidator, updateUser)
-  .delete(deleteUserValidator, deleteUser);
+  .delete(deleteUserValidator,deletVehiclesUser, deleteUser);
 router
 .route('/deactivate/:id')
 .put(

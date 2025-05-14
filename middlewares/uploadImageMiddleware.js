@@ -1,6 +1,6 @@
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('../config/cloudinary');  // Import Cloudinary configuration
+const cloudinary = require('../config/cloudinary');  
 const ApiError = require('../utils/apiError');
 const multerOptions = ({ fileSizeLimit = 10 * 1024 * 1024 }) => {
 
@@ -23,13 +23,13 @@ const multerOptions = ({ fileSizeLimit = 10 * 1024 * 1024 }) => {
   return multer({
     storage: storage,
     fileFilter: multerFilter, 
-    limits: { fileSize: fileSizeLimit }, // File size limit (e.g., 10MB)
+    limits: { fileSize: fileSizeLimit }, 
   });
 };
  
-// Reusable middleware function for a single image upload
+
 exports.uploadSingleImage = (fieldName, options = {}) => multerOptions(options).single(fieldName);
 
-// Reusable middleware function for multiple image uploads
+
 exports.uploadMixOfImages = (arrayOfFields, options = {}) =>
   multerOptions(options).fields(arrayOfFields); 

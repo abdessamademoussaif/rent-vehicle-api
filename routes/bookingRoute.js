@@ -10,33 +10,19 @@ const {
   updateUserBooking,
   updateBookingStatus,
   cancelBooking,
+  getAllBookings,
+  getBookingById,
 } = require('../services/bookingService');
 
 const router = express.Router();
 
-// Create a new booking
-router.post('/',
-   authService.protect,
-   createBookingValidator,
-   isVehicleAlreadyBooked, 
-   createBooking
-  );
-
-// Get all bookings of a user
-router.get('/user/:userId', authService.protect, getUserBookings);
-
-// Update booking status (only for admin or manager)
-router.put('/:id', authService.protect, authService.allowedTo('admin', 'manager'), updateBookingStatus);
-
-router.put(
-  '/:id',
-  authService.protect,
-  authService.allowedTo('user'),
-  isVehicleAlreadyBooked,
-  updateUserBooking
-);
-
-// Cancel a booking
-router.delete('/:id', authService.protect, authService.allowedTo('admin', 'manager'), cancelBooking);
+router
+.get('/',authService.protect,authService.allowedTo('admin'),getAllBookings)
+.get('/:id',authService.protect,getBookingById)
+.get('/user/:userId',authService.protect, getUserBookings)
+.post('/',authService.protect,createBookingValidator,isVehicleAlreadyBooked,createBooking)
+.patch('/:id/status',authService.protect, updateBookingStatus)
+.put('/:id',authService.protect,isVehicleAlreadyBooked,updateUserBooking)
+.delete('/:id',authService.protect, cancelBooking);
 
 module.exports = router;

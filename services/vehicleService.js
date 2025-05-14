@@ -60,6 +60,7 @@ exports.getVehiclesByUserId = asyncHandler(async (req, res, next) => {
   });
 });
 
+
 // @desc    Count vehicles
 // @route   GET /api/v1/vehicles/count
 // @access  private/admin
@@ -76,6 +77,7 @@ exports.countVehicles = asyncHandler(async (req, res, next) => {
 // @route   POST  /api/v1/vehicles
 // @access  Private
 
+
 exports.createVehicle = factory.createOne(Vehicle);
 // @desc    Update specific vehicle
 // @route   PUT /api/v1/vehicles/:id
@@ -87,3 +89,6 @@ exports.updateVehicle = factory.updateOne(Vehicle);
 // @access  Private
 exports.deleteVehicle = factory.deleteOne(Vehicle);
 ;
+
+const mongoose = require('mongoose');
+

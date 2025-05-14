@@ -18,19 +18,18 @@ const {
 } = require('../services/reviewService');
 
 const authService = require('../services/authService');
-
+const setReviewParam = require('../middlewares/setReviewParam');
 const router = express.Router({ mergeParams: true });
 
 router
   .route('/')
-  .get(createFilterObj, getReviews)
+  .get(setReviewParam ,createFilterObj , getReviews)
   .post(
     authService.protect,
-    authService.allowedTo('user'),
     setVehicleIdAndUserIdToBody,
     createReviewValidator,
     createReview
-  );
+  )
 router 
   .route('/:id')
   .get(getReviewValidator, getReview)
