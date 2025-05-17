@@ -61,7 +61,7 @@ router
   );
   router.route('/user/:userId').get(
     authService.protect,
-    authService.allowedTo('admin', 'manager'),
+    authService.allowedTo('admin', 'manager','user'),
     getVehiclesByUserId
   );
 
