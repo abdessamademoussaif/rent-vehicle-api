@@ -16,36 +16,7 @@ router.get(
   passport.authenticate('google', { session: false }),
   (req, res) => {
     const token = createToken(req.user._id);
-   
-    res.cookie('authToken', token, {
-      httpOnly: false,
-      secure: false, //process.env.NODE_ENV === 'production'
-      sameSite: 'None',  //process.env.NODE_ENV === 'production' ? 'none' : 
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    res.cookie('profileImg', req.user.profileImg, {
-      httpOnly: false,
-      secure: false, //process.env.NODE_ENV === 'production'
-      sameSite: 'None',  //process.env.NODE_ENV === 'production' ? 'none' : 
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    res.cookie('userId', req.user._id.toString() , {
-      httpOnly: false,
-      secure: false,  //process.env.NODE_ENV === 'production'
-      sameSite: 'None',  //process.env.NODE_ENV === 'production' ? 'none' : 
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-
-    res.cookie('role', req.user.role, {
-      httpOnly: false, 
-      secure: false,  //process.env.NODE_ENV === 'production' 
-      sameSite: 'None',  //process.env.NODE_ENV === 'production' ? 'none' : 
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-   
-    res.redirect(`${process.env.CLIENT_URL}`);
+    res.redirect(`${process.env.CLIENT_URL}?token=${token}`);
   }
 );
 

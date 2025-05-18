@@ -174,7 +174,7 @@ vehicleSchema.pre(/^find/, function (next) {
   }).populate({
     path: 'owner',
     select: 'title name email phone profileImg _id',
-  });
+  }).sort({ ratingsAverage: -1 });
   next();
 });
 vehicleSchema.pre('save', function (next) {

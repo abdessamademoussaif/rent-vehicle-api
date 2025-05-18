@@ -1,22 +1,22 @@
-const asyncHandler = require('express-async-handler');
-const bcrypt = require('bcryptjs');
+const asyncHandler = require("express-async-handler");
+const bcrypt = require("bcryptjs");
 
-const factory = require('./handlersFactory');
-const ApiError = require('../utils/apiError');
-const { uploadSingleImage } = require('../middlewares/uploadImageMiddleware');
-const createToken = require('../utils/createToken');
-const User = require('../models/userModel');
-const cloudinary = require('../config/cloudinary');
+const factory = require("./handlersFactory");
+const ApiError = require("../utils/apiError");
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+const createToken = require("../utils/createToken");
+const User = require("../models/userModel");
+const cloudinary = require("../config/cloudinary");
 
 // Upload single image
-exports.uploadUserImage = uploadSingleImage('profileImg');
+exports.uploadUserImage = uploadSingleImage("profileImg");
 
 exports.uploadUserImageToCloudinary = asyncHandler(async (req, res, next) => {
   if (req.file) {
-    console.log('req.body:', req.body); 
-    console.log('req.files:', req.file); 
+    console.log("req.body:", req.body);
+    console.log("req.files:", req.file);
     const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: 'users',
+      folder: "users",
     });
 
     // Save URL and public_id in request body
@@ -64,7 +64,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
       email: req.body.email,
       profileImg: req.body.profileImg,
       role: req.body.role,
-      address: req.body.address
+      address: req.body.address,
     },
     {
       new: true,
@@ -112,7 +112,7 @@ exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
 exports.countUsers = asyncHandler(async (req, res, next) => {
   const count = await User.countDocuments();
   res.status(200).json({
-    status: 'success',
+    status: "success",
     data: {
       count,
     },
@@ -149,7 +149,6 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
     req.user._id,
     {
       name: req.body.name,
-      email: req.body.email,
       phone: req.body.phone,
     },
     { new: true }
@@ -162,17 +161,16 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/users/updateImgMe
 // @access  Private/Protect
 exports.updateLoggedUserImage = asyncHandler(async (req, res, next) => {
-    const updateUser = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        profileImg: req.body.profileImg,
-        profileImgPublicId: req.body.profileImgPublicId,
-      },
-      { new: true }
-    );
-    res.status(200).json({ data: updateUser });
+  const updateUser = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      profileImg: req.body.profileImg,
+      profileImgPublicId: req.body.profileImgPublicId,
+    },
+    { new: true }
+  );
+  res.status(200).json({ data: updateUser });
 });
-
 
 // @desc    Deactivate logged user
 // @route   DELETE /api/v1/users/deleteMe
@@ -180,13 +178,13 @@ exports.updateLoggedUserImage = asyncHandler(async (req, res, next) => {
 exports.deleteLoggedUserData = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user._id, { active: false });
 
-  res.status(2007[[]]).json({ status: 'Success' });
+  res.status((2007)[[]]).json({ status: "Success" });
 });
 // @desc    Deactivate user
 // @route   DELETE /api/v1/users/deactivate/:id
 // @access  Private/Admin
 
-exports.deactivateUser = asyncHandler(async (req, res, next) => { 
+exports.deactivateUser = asyncHandler(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(
     req.params.id,
     { active: false },
@@ -197,9 +195,8 @@ exports.deactivateUser = asyncHandler(async (req, res, next) => {
     return next(new ApiError(`No document for this id ${req.params.id}`, 404));
   }
 
-  res.status(200).json({ status: 'success', data: null });
-}
-);
+  res.status(200).json({ status: "success", data: null });
+});
 
 // @desc    Activate user
 // @route   PUT /api/v1/users/activate/:id
@@ -216,6 +213,7 @@ exports.activateUser = asyncHandler(async (req, res, next) => {
     return next(new ApiError(`No document for this id ${req.params.id}`, 404));
   }
 
-  res.status(200).json({ status: 'success', data: null });
-}
-);
+  res.status(200).json({ status: "success", data: null });
+});
+
+

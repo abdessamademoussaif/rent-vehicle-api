@@ -38,6 +38,7 @@ router.put('/changeMyPassword', updateLoggedUserPassword);
 router.put('/updateMe', updateLoggedUserValidator, updateLoggedUserData);
 router.delete('/deleteMe', deleteLoggedUserData);
 router.put('/updateImgMe', uploadUserImage, uploadUserImageToCloudinary, updateLoggedUserImage);
+router.put
 
 // Admin
 router.use(authService.allowedTo('admin'));

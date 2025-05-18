@@ -11,7 +11,8 @@ const sendEmail = require("../utils/sendEmail");
 // @route   POST /api/v1/bookings
 // @access  Private
 exports.createBooking = asyncHandler(async (req, res, next) => {
-  const { vehicle, userPhone, userAddress, startDate, endDate, name } = req.body;
+  const { vehicle, userPhone, userAddress, startDate, endDate, name } =
+    req.body;
   const user = req.user.id;
   const userEmail = req.user.email;
 
@@ -21,7 +22,10 @@ exports.createBooking = asyncHandler(async (req, res, next) => {
   );
 
   // Fetch vehicle and owner details
-  const vehicleDetails = await Vehicle.findById(vehicle).populate("owner", "email name");
+  const vehicleDetails = await Vehicle.findById(vehicle).populate(
+    "owner",
+    "email name"
+  );
   if (!vehicleDetails) {
     return next(new ApiError("Vehicle not found", 404));
   }
@@ -41,20 +45,21 @@ exports.createBooking = asyncHandler(async (req, res, next) => {
     totalPrice,
   });
 
-  // Create notification
+  
+  const populatedBooking = await Booking.findById(booking._id)
+    .populate("user", "name email phone")
+    .populate("vehicle", "model title location pricePerDay");
+
+    // Create notification
   await Notification.create({
     recipient: vehicleDetails.owner._id,
     type: "reservation",
-    content: `New reservation request from ${name} for your vehicle.`,
+    content: `New reservation request from ${populatedBooking.user.name} for your vehicle.`,
     metadata: {
       vehicleId: vehicleDetails._id,
       reservationId: booking._id,
     },
   });
-
-  const populatedBooking = await Booking.findById(booking._id)
-  .populate("user", "name email phone")
-  .populate("vehicle", "model title location pricePerDay");
 
   const message = `
     <table style="max-width: 600px; margin: auto; background-color: #ffffff; padding: 40px 30px; font-family: Arial, sans-serif; border: 1px solid #eee; border-radius: 8px;" width="100%" cellspacing="0" cellpadding="0">
@@ -123,7 +128,6 @@ exports.createBooking = asyncHandler(async (req, res, next) => {
   res.status(201).json({ data: populatedBooking });
 });
 
-
 // @desc    Get all bookings
 // @desc    Get /api/v1/bookings
 // @desc    Private/admin
@@ -139,8 +143,7 @@ exports.getAllBookings = asyncHandler(async (req, res, next) => {
 // @desc    Private
 exports.getBookingById = asyncHandler(async (req, res, next) => {
   const bookingId = req.params.id;
-  console.log(bookingId);
-  const userId = req.user.id;
+  const userId = req.user._id;
 
   if (!mongoose.Types.ObjectId.isValid(bookingId)) {
     return res.status(400).json({ message: "Invalid booking ID." });
@@ -160,7 +163,11 @@ exports.getBookingById = asyncHandler(async (req, res, next) => {
   if (!booking) {
     return res.status(404).json({ message: "Booking not found." });
   }
-  if (booking.vehicle.owner._id.toString() !== userId) {
+
+  if (
+    booking.vehicle.owner._id.toString() !== userId.toString() &&
+    booking.user._id.toString() !== userId.toString()
+  ) {
     return res
       .status(403)
       .json({ message: "You are not authorized to view this booking." });
@@ -174,7 +181,7 @@ exports.getBookingById = asyncHandler(async (req, res, next) => {
 exports.getUserBookings = asyncHandler(async (req, res, next) => {
   const user = req.user._id;
   const userId = req.params.userId;
-  if (user.toString() !== userId) {
+  if (user.toString() !== userId.toString()) {
     return next(
       new ApiError("You are not authorized to view this booking", 403)
     );
@@ -182,7 +189,10 @@ exports.getUserBookings = asyncHandler(async (req, res, next) => {
   if (!userId) {
     userId = req.user._id;
   }
-  const bookings = await Booking.find({ user: userId })
+  const bookings = await Booking.find({
+    user: userId,
+    status: { $ne: "cancelled" },
+  })
     .populate("vehicle", "title imageCover pricePerDay location")
     .populate("user", "name email phone ");
   res.status(200).json({ data: bookings });
@@ -230,7 +240,7 @@ exports.updateBookingStatus = asyncHandler(async (req, res, next) => {
   if (!booking) {
     return next(new ApiError("Booking not found", 404));
   }
-  if (userId != booking.vehicle.owner._id) {
+  if (userId.toString() !== booking.vehicle.owner._id.toString()) {
     return next(
       new ApiError("You are not authorized to update this booking ", 403)
     );
@@ -258,8 +268,8 @@ exports.cancelBooking = asyncHandler(async (req, res, next) => {
       new ApiError("You are not authorized to cancel this booking", 403)
     );
   }
-
-  await booking.deleteOne();
+  booking.status = "cancelled";
+  await booking.save();
 
   res.status(204).send();
 });
