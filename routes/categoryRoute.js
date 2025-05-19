@@ -1,11 +1,11 @@
-const express = require('express');
+const express = require("express");
 
 const {
   getCategoryValidator,
   createCategoryValidator,
   updateCategoryValidator,
   deleteCategoryValidator,
-} = require('../utils/validators/categoryValidator');
+} = require("../utils/validators/categoryValidator");
 
 const {
   getCategories,
@@ -15,31 +15,33 @@ const {
   deleteCategory,
   uploadCategoryImage,
   uploadCategoryImageToCloudinary,
-} = require('../services/categoryService');
+  countCategories,
+} = require("../services/categoryService");
 
-const authService = require('../services/authService');
-
+const authService = require("../services/authService");
 
 const router = express.Router();
 
-
 router
-  .route('/')
+  .route("/")
   .get(getCategories)
   .post(
     authService.protect,
-    authService.allowedTo('admin', 'manager'),
+    authService.allowedTo("admin", "manager"),
     uploadCategoryImage,
     uploadCategoryImageToCloudinary,
     createCategoryValidator,
     createCategory
   );
+  router
+    .route("/count")
+    .get(authService.protect, authService.allowedTo("admin"), countCategories);
 router
-  .route('/:id')
+  .route("/:id")
   .get(getCategoryValidator, getCategory)
   .put(
     authService.protect,
-    authService.allowedTo('admin', 'manager'),
+    authService.allowedTo("admin", "manager"),
     uploadCategoryImage,
     uploadCategoryImageToCloudinary,
     updateCategoryValidator,
@@ -47,7 +49,7 @@ router
   )
   .delete(
     authService.protect,
-    authService.allowedTo('admin'),
+    authService.allowedTo("admin"),
     deleteCategoryValidator,
     deleteCategory
   );

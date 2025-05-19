@@ -1,13 +1,13 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const slugify = require('slugify');
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const slugify = require("slugify");
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       trim: true,
-      required: [true, 'name required'],
+      required: [true, "name required"],
     },
     slug: {
       type: String,
@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, 'email required'],
+      required: [true, "email required"],
       unique: true,
       lowercase: true,
     },
@@ -24,8 +24,8 @@ const userSchema = new mongoose.Schema(
     profileImgPublicId: String,
     password: {
       type: String,
-      required: [true, 'password required'],
-      minlength: [6, 'Too short password'],
+      required: [true, "password required"],
+      minlength: [6, "Too short password"],
     },
     passwordChangedAt: Date,
     passwordResetCode: String,
@@ -33,8 +33,11 @@ const userSchema = new mongoose.Schema(
     passwordResetVerified: Boolean,
     role: {
       type: String,
-      enum: ['user', 'manager', 'admin'],
-      default: 'user',
+      enum: {
+        values: ["user", "manager", "admin"],
+        message: "role is either: user, manager, admin",
+      },
+      default: "user",
     },
     active: {
       type: Boolean,
@@ -51,39 +54,34 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Auto-generate slug from name
-userSchema.pre('save', function (next) {
-  if (this.isModified('name')) {
+userSchema.pre("save", function (next) {
+  if (this.isModified("name")) {
     this.slug = slugify(this.name, { lower: true });
   }
   next();
 });
 
-// Hash password if modified
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
 
-// Update passwordChangedAt if password changed
-userSchema.pre('save', function (next) {
-  if (!this.isModified('password') || this.isNew) return next();
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
-// Remove password from response
-userSchema.set('toJSON', {
+userSchema.set("toJSON", {
   transform: function (doc, ret, options) {
     delete ret.password;
     return ret;
   },
 });
 
-// Compare input password with hashed password
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);

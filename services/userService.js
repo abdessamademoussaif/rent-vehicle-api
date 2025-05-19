@@ -50,25 +50,11 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new ApiError(`No document for this id ${req.params.id}`, 404));
   }
-
-  // If a new image is uploaded, delete the old one from Cloudinary
-  if (req.body.profileImg && user.profileImgPublicId) {
-    await cloudinary.uploader.destroy(user.profileImgPublicId);
-  }
   const document = await User.findByIdAndUpdate(
     req.params.id,
     {
-      name: req.body.name,
-      slug: req.body.slug,
-      phone: req.body.phone,
-      email: req.body.email,
-      profileImg: req.body.profileImg,
       role: req.body.role,
-      address: req.body.address,
     },
-    {
-      new: true,
-    }
   );
   res.status(200).json({ data: document });
 });
@@ -109,15 +95,7 @@ exports.getLoggedUserData = asyncHandler(async (req, res, next) => {
 // @desc    Count users
 // @route   GET /api/v1/users/count
 // @access  Private/Admin
-exports.countUsers = asyncHandler(async (req, res, next) => {
-  const count = await User.countDocuments();
-  res.status(200).json({
-    status: "success",
-    data: {
-      count,
-    },
-  });
-});
+exports.countUsers = factory.count(User)
 
 // @desc    Update logged user password
 // @route   PUT /api/v1/users/updateMyPassword

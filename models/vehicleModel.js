@@ -167,13 +167,13 @@ vehicleSchema.virtual('reviews', {
 vehicleSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'category',
-    select: 'name -_id',
+    select: 'name ',
   }).populate({
     path: 'mark',
-    select: 'name -_id',
+    select: 'name ',
   }).populate({
     path: 'owner',
-    select: 'title name email phone profileImg _id',
+    select: 'title name email phone profileImg',
   }).sort({ ratingsAverage: -1 });
   next();
 });

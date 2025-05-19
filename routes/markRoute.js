@@ -1,12 +1,12 @@
-const express = require('express');
+const express = require("express");
 const {
   getMarkValidator,
   createMarkValidator,
   updateMarkValidator,
   deleteMarkValidator,
-} = require('../utils/validators/markValidator');
+} = require("../utils/validators/markValidator");
 
-const authService = require('../services/authService');
+const authService = require("../services/authService");
 
 const {
   getMarks,
@@ -16,27 +16,31 @@ const {
   deleteMark,
   uploadMarkImage,
   uploadMarkImageToCloudinary,
-} = require('../services/markService');
+  countMarks,
+} = require("../services/markService");
 
 const router = express.Router();
 
 router
-  .route('/')
+  .route("/")
   .get(getMarks)
   .post(
     authService.protect,
-    authService.allowedTo('admin', 'manager'),
+    authService.allowedTo("admin", "manager"),
     uploadMarkImage,
     uploadMarkImageToCloudinary,
     createMarkValidator,
     createMark
   );
 router
-  .route('/:id')
+  .route("/count")
+  .get(authService.protect, authService.allowedTo("admin"), countMarks);
+router
+  .route("/:id")
   .get(getMarkValidator, getMark)
   .put(
     authService.protect,
-    authService.allowedTo('admin', 'manager'),
+    authService.allowedTo("admin", "manager"),
     uploadMarkImage,
     uploadMarkImageToCloudinary,
     updateMarkValidator,
@@ -44,7 +48,7 @@ router
   )
   .delete(
     authService.protect,
-    authService.allowedTo('admin'),
+    authService.allowedTo("admin"),
     deleteMarkValidator,
     deleteMark
   );

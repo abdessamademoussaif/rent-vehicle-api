@@ -58,7 +58,7 @@ router.get('/count', countUsers);
 router
   .route('/:id')
   .get(getUserValidator, getUser)
-  .put(uploadUserImage, uploadUserImageToCloudinary, updateUserValidator, updateUser)
+  .put(updateUserValidator,updateUser)
   .delete(deleteUserValidator,deletVehiclesUser, deleteUser);
 router
 .route('/deactivate/:id')

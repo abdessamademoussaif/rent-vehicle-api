@@ -3,6 +3,7 @@ const asyncHandler = require('express-async-handler');
 const { uploadMixOfImages } = require('../middlewares/uploadImageMiddleware');
 const factory = require('./handlersFactory');
 const Vehicle = require('../models/vehicleModel');
+const ApiError = require("../utils/ApiError");
 
 exports.uploadVehicleImages = uploadMixOfImages([
   {
@@ -32,6 +33,21 @@ exports.setVehicleImagesUrls = asyncHandler(async (req, res, next) => {
   next();
 });
 
+
+
+exports.isAuthorized = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  const vehicle = await Vehicle.findById(id);
+
+  if (!vehicle) {
+    return next(new ApiError(`No vehicle found for id ${id}`, 404));
+  }
+  if (req.user._id.toString() !== vehicle.owner._id.toString() && req.user.role !== 'admin') {
+    return next(new ApiError(`You are not authorized to do this action`, 403));
+  }
+
+  next();
+});
 
 
 // @desc    Get list of vehicles
@@ -64,15 +80,7 @@ exports.getVehiclesByUserId = asyncHandler(async (req, res, next) => {
 // @desc    Count vehicles
 // @route   GET /api/v1/vehicles/count
 // @access  private/admin
-exports.countVehicles = asyncHandler(async (req, res, next) => {
-  const count = await Vehicle.countDocuments();
-  res.status(200).json({
-    status: 'success',
-    data: {
-      count,
-    },
-  });
-});
+exports.countVehicles = factory.count(Vehicle);
 // @desc    Create vehicle
 // @route   POST  /api/v1/vehicles
 // @access  Private
@@ -87,6 +95,7 @@ exports.updateVehicle = factory.updateOne(Vehicle);
 // @access  Private
 exports.deleteVehicle = factory.deleteOne(Vehicle);
 ;
+
 
 const mongoose = require('mongoose');
 

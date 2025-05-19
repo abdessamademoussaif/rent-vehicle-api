@@ -43,3 +43,8 @@ exports.updateMark = factory.updateOne(Mark);
 // @route   DELETE /api/v1/marks/:id
 // @access  Private
 exports.deleteMark = factory.deleteOne(Mark);
+
+// @desc    count all marks
+// @route   get /api/v1/marks/count
+// @access  Private/admin
+exports.countMarks = factory.count(Mark);

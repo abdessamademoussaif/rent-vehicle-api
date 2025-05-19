@@ -50,7 +50,6 @@ exports.login = asyncHandler(async (req, res, next) => {
 // @desc   make sure the user is logged in
 exports.protect = asyncHandler(async (req, res, next) => {
   let token;
-
   if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }

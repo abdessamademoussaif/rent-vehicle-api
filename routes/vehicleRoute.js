@@ -16,6 +16,7 @@ const {
   uploadVehicleImages,
   setVehicleImagesUrls,
   countVehicles,
+  isAuthorized,
 } = require('../services/vehicleService');
 const authService = require('../services/authService');
 const reviewsRoute = require('./reviewRoute');
@@ -55,8 +56,8 @@ router
   )
   .delete(
     authService.protect,
-    authService.allowedTo('admin'),
     deleteVehicleValidator,
+    isAuthorized,
     deleteVehicle
   );
   router.route('/user/:userId').get(

@@ -43,3 +43,9 @@ exports.updateCategory = factory.updateOne(Category);
 // @route   DELETE /api/v1/categories/:id
 // @access  Private/Admin
 exports.deleteCategory = factory.deleteOne(Category);
+
+
+// @desc    count all categories
+// @route   get /api/v1/categories/count
+// @access  Private/Admin
+exports.countCategories = factory.count(Category);
